@@ -1,0 +1,107 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject ISnackbar Snackbar
+
+<PageTitle>Отчетность</PageTitle>
+
+
+<MyMudProviders></MyMudProviders>
+<MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="IncrementCount">Click me</MudButton>
+
+
+<MudTable Items="@employees" Hover="true">
+    <HeaderContent>
+        <MudTh>Имя</MudTh>
+        <MudTh>Выплачено</MudTh>
+        <MudTh>Дата</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.Name</MudTd>
+        <MudTd DataLabel="Sign">@context.Salary $</MudTd>
+        <MudTd DataLabel="Name">@context.Payday.ToString("dd.MM.yyyy")</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100, int.MaxValue }"
+                       RowsPerPageString="@rowsPerPageString"
+                       InfoFormat="@infoFormat"
+                       AllItemsText="@allItemsText"
+                       HorizontalAlignment="@horizontalAlignment"
+                       HideRowsPerPage="@hideRowsPerPage"
+                       HidePageNumber="@hidePageNumber"
+                       HidePagination="@hidePagination" />
+    </PagerContent>
+</MudTable>
+
+
+
+@if (report != null)
+{
+    <MudPaper>
+        <div style="display: flex; flex-direction: column">
+            <div>@report.Header</div>
+            <div>@report.Body</div>
+            <div>@report.Footer</div>
+        </div>
+    </MudPaper>
+}
+@i
+
+@code{
+
+    const int EMPLOYEES_COUNT = 500;
+    int i = 0;
+    private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Right;
+    private bool hidePageNumber;
+    private bool hidePagination;
+    private bool hideRowsPerPage;
+    private string rowsPerPageString = "Rows per page:";
+    private string infoFormat = "{first_item}-{last_item} of {all_items}";
+    private string allItemsText = "All";
+
+    private string firstNamesAsStr = "Абрам,Адам,Аким,Александр,Алексей,Альберт,Анатолий,Андрей,Антон,Аркадий,Арсений,Артем,Артур,Борис,Вадим,Валентин,Валерий,Василий,Вениамин,Виктор,Виталий,Владимир,Владислав,Всеволод,Вячеслав,Геннадий,Георгий,Герман,Глеб,Григорий,Давид,Даниил,Денис,Дмитрий,Евгений,Егор,Ефим,Иван,Игорь,Илья,Иннокентий,Иосиф,Ираклий,Кирилл,Клим,Константин,Лев,Леонид,Макар,Максим,Марк,Матвей,Михаил,Назар,Никита,Николай,Олег,Павел,Петр,Прохор,Родион,Роман,Руслан,Семен,Сергей,Станислав,Степан,Тарас,Тимофей,Тимур,Тихон,Федор,Феликс,Филипп,Ярослав";
+    string lastNamesAsStr = "Александров,Алексеев,Андреев,Антонов,Артемьев,Астахов,Баранов,Белов,Богданов,Васильев,Веселов,Волков,Воронцов,Гаврилов,Герасимов,Голубев,Григорьев,Данилов,Дмитриев,Зайцев,Иванов,Ильин,Исаев,Кириллов,Королев,Крылов,Кузнецов,Кузьмин,Куликов,Лазарев,Лебедев,Леонов,Логинов,Лукин,Любимов,Максимов,Малинин,Марков,Медведев,Миронов,Михайлов,Морозов,Муромцев,Никитин,Николаев,Орлов,Осипов,Павлов,Петров,Поляков,Попов,Романов,Рыков,Савельев,Селезнев,Сергеев,Соколов,Степанов,Тарасов,Титов,Тихонов,Третьяков,Трофимов,Туров,Федоров,Фомичев,Хабаров,Харламов,Царев,Цветков,Чернов,Шариков,Ширяев,Шувалов,Щербаков,Юрьев,Яковлев";
+
+    List<string> firstNames = new();
+    List<string> lastNames = new();
+    List<Employee> employees = new();
+
+    EmployeeReportBuilder builder;
+    EmployeeReportDirector director;
+    EmployeeReport? report = null;
+
+    protected override void OnInitialized()
+    {
+        firstNames = firstNamesAsStr.Split(",").ToList();
+        lastNames = lastNamesAsStr.Split(",").ToList();
+
+        employees = GenerateEmployees();
+
+
+        
+        director = new EmployeeReportDirector(builder);
+        director = new EmployeeReportDirector(builder);
+
+
+    }
+
+    private List<Employee> GenerateEmployees()
+    {
+        List<Employee> employees = new();
+
+        Random rnd = new();
+
+        for (int i = 0; i < EMPLOYEES_COUNT; i++)
+        {
+            employees.Add(new Employee() { Name = $"{firstNames[rnd.Next(0, firstNames.Count)]} {lastNames[rnd.Next(0, lastNames.Count)]}", Salary = rnd.Next(150, 1500), Payday = new DateTime(rnd.Next(2023, 2024), rnd.Next(1, 12), rnd.Next(1, 28)) });
+        }
+
+        return employees;
+    }
+
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

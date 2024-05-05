@@ -1,0 +1,81 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+
+@inject ISnackbar Snackbar
+@using Employee.Components.Models.LAB2
+
+<MyMudProviders />
+<MudButton OnClick="BuyTicketToCinema">Купить билет в кино</MudButton>
+<MudButton OnClick="BuyTicketToZoo">Купить билеты в зоопарк</MudButton>
+
+<MudPaper>
+    <MudText>Кол-во билетов: @customer.tickets.Count()</MudText>
+</MudPaper>
+
+
+@code {
+    Customer customer = new();
+    List<string> places = new(); 
+
+    public void BuyTicketToZoo()
+    {
+        Zoo zoo = new();
+        zoo.Buy(customer);
+    }
+
+    public void BuyTicketToCinema()
+    {
+        Cinema cinema = new();
+        cinema.Buy(customer);
+    }
+
+
+    public interface IVisitor
+    {
+        void Visit(Zoo zoo);
+        void Visit(Cinema zoo);
+
+    }
+
+    public interface ITicket
+    {
+        public void Buy(IVisitor v);
+    }
+
+    public class Zoo : ITicket
+    {
+        public int nubmer;
+
+        public void Buy(IVisitor v)
+        {
+            v.Visit(this);
+        }
+
+    }
+
+    public  class Cinema : ITicket
+    {
+        public int nubmer;
+
+        public void Buy(IVisitor v)
+        {
+            v.Visit(this);
+        }
+    }
+
+    public class Customer : IVisitor
+    {
+        public List<ITicket> tickets = new();
+
+        public void Visit(Cinema ticket)
+        {
+            tickets.Add(ticket);
+        }
+
+        public void Visit(Zoo ticket)
+        {
+            tickets.Add(ticket);
+        }
+    }
+
+}
